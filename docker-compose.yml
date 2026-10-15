@@ -55,6 +55,16 @@ services:
     depends_on:
       - backend
 
+  frontend-prod:
+    profiles: [prod]
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile.prod
+    ports:
+      - "4300:80"
+    depends_on:
+      - backend
+
 volumes:
   postgres_data:
   backend_node_modules:

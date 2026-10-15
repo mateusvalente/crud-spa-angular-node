@@ -61,6 +61,8 @@ crud-spa-angular-node/
 │   │   ├── main.ts
 │   │   └── styles.css
 │   ├── Dockerfile
+│   ├── Dockerfile.prod
+│   ├── nginx.conf
 │   ├── angular.json
 │   └── package.json
 │
@@ -70,7 +72,7 @@ crud-spa-angular-node/
 
 ## Dockerfiles
 
-Os Dockerfiles não copiam o código para a imagem.
+No modo de desenvolvimento, os Dockerfiles não copiam o código para a imagem.
 
 O código é montado por bind mount:
 
@@ -97,7 +99,10 @@ O PostgreSQL possui volume persistente:
 postgres_data:/var/lib/postgresql/data
 ```
 
-## Executar
+O `frontend/Dockerfile.prod` compila o Angular e copia o resultado para uma
+imagem Nginx. Essa imagem serve os arquivos gerados, sem executar `ng serve`.
+
+## Executar em desenvolvimento
 
 Na raiz do projeto:
 
@@ -109,6 +114,27 @@ Abra:
 
 ```text
 http://localhost:4200
+```
+
+O front-end de desenvolvimento usa `ng serve` na porta 4200.
+
+## Executar o build de produção
+
+Na raiz do projeto, execute:
+
+```bash
+docker compose --profile prod up -d --build frontend-prod
+```
+
+Abra `http://localhost:4300`. O comando compila o Angular, inicia o Nginx e
+sobe também o backend e o PostgreSQL, se necessário. O Nginx encaminha `/api/`
+para o backend e retorna `index.html` nas rotas da SPA. O serviço de
+desenvolvimento na porta 4200 não é iniciado por esse comando.
+
+Para parar apenas o front-end de produção:
+
+```bash
+docker compose --profile prod stop frontend-prod
 ```
 
 API:
